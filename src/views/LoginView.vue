@@ -49,6 +49,7 @@
                   type="submit"
                   :loading="loading"
                   class="font-orbitron"
+                  @click.prevent="toDash()"
                 >
                   <v-icon start>mdi-login</v-icon>
                   Iniciar sesión
@@ -64,7 +65,10 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import logo from "@/assets/logo.png";
+
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
@@ -73,6 +77,10 @@ const loading = ref(false);
 
 const rules = {
   required: (v) => !!v || "Este campo es obligatorio",
+};
+
+const toDash = async () => {
+  router.push("/dashboard");
 };
 
 function handleLogin() {
