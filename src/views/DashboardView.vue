@@ -1,44 +1,69 @@
 <template>
   <v-app class="touni-app">
     <!-- Toolbar -->
-    <v-toolbar height="200" class="text-white gold-border mb-6" color="transparent">
-      <v-img :src="logo" height="170" contain class="ml-2 img-logo" />
+    <v-toolbar height="auto" class="text-white gold-border" color="transparent">
+      <v-col cols="5">
+        <v-img :src="logo" height="170" contain class="ml-2 img-logo" />
+      </v-col>
       <v-spacer />
-      <v-btn
-        color="black"
-        variant="flat"
-        icon="mdi-wallet"
-        class="top-button touni-text-color mr-4"
-      />
-      <v-btn
-        icon="mdi-account"
-        color="black"
-        variant="flat"
-        class="top-button touni-text-color mr-4"
-      />
-      <v-btn
-        icon="mdi-currency-usd"
-        color="black"
-        variant="flat"
-        class="top-button touni-text-color mr-4"
-      />
-      <v-btn
-        icon="mdi-gamepad-variant"
-        color="black"
-        variant="flat"
-        class="top-button touni-text-color mr-4"
-      />
-      <v-btn
-        icon="mdi-trophy"
-        color="black"
-        variant="flat"
-        class="top-button touni-text-color mr-4"
-      />
+      <v-col cols="7">
+        <div>
+          <v-row align="center" class="glass-card rounded mr-2">
+            <v-col cols="4">
+              <v-avatar size="56" class="mx-auto ml-4">
+                <v-img :src="avatar" />
+              </v-avatar>
+              SummonerName
+            </v-col>
+            <v-col cols="5" class="touni-text-color">Saldo $ 4,56 | 524,20 USDT</v-col>
+            <v-col cols="3" class="touni-text-color">
+              <v-btn block color="#00ff88" class="font-orbitron">
+                <v-icon start>mdi-logout</v-icon>
+                Cerrar sessión
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row align="center" justify="end">
+            <v-col cols="auto">
+              <v-btn
+                color="black"
+                variant="flat"
+                icon="mdi-wallet"
+                class="top-button touni-text-color mr-4"
+              />
+              <v-btn
+                icon="mdi-account"
+                color="black"
+                variant="flat"
+                class="top-button touni-text-color mr-4"
+              />
+              <v-btn
+                icon="mdi-currency-usd"
+                color="black"
+                variant="flat"
+                class="top-button touni-text-color mr-4"
+              />
+              <v-btn
+                icon="mdi-gamepad-variant"
+                color="black"
+                variant="flat"
+                class="top-button touni-text-color mr-4"
+              />
+              <v-btn
+                icon="mdi-trophy"
+                color="black"
+                variant="flat"
+                class="top-button touni-text-color mr-4"
+              />
+            </v-col>
+          </v-row>
+        </div>
+      </v-col>
     </v-toolbar>
     <!-- Main content -->
-    <v-main class="touni-background">
-      <v-container fluid class="pa-4">
-        <v-row>
+    <v-main class="touni-background flex-grow-1 overflow-auto">
+      <v-container fluid class="pa-4 h-100">
+        <v-row class="h-100">
           <!-- Left card: Featured Tournament -->
           <v-col cols="12" md="3">
             <v-card class="glass-card mb-4">
@@ -52,11 +77,14 @@
             <!-- Deposit and Account -->
             <v-card class="glass-card d-flex align-center pa-4">
               <div class="text-center w-50">
-                <v-icon size="48" color="green">mdi-cash-plus</v-icon>
+                <v-avatar size="100" class="mx-auto mb-2">
+                  <v-img :src="coin" />
+                  <!--              <v-icon size="48" color="green">mdi-cash-plus</v-icon -->
+                </v-avatar>
                 <p class="touni-text-color">Deposit</p>
               </div>
               <div class="text-center w-50">
-                <v-avatar size="56" class="mx-auto mb-2">
+                <v-avatar size="100" class="mx-auto mb-2">
                   <v-img :src="avatar" />
                 </v-avatar>
                 <p class="touni-text-color">SummonerName</p>
@@ -75,7 +103,30 @@
                 hide-default-footer
                 dense
                 style="height: 100%"
-              />
+              >
+                <template #[`item.estado`]="{ item }">
+                  <v-btn
+                    v-if="item.estado === 'R'"
+                    color="#00ff88"
+                    variant="outlined"
+                    size="small"
+                  >
+                    Registrar
+                  </v-btn>
+
+                  <v-btn
+                    v-else-if="item.estado === 'U'"
+                    color="red"
+                    variant="outlined"
+                    size="small"
+                  >
+                    Desregistrarse
+                  </v-btn>
+                  <v-btn v-else color="#00ff88" variant="outlined" size="small">
+                    En curso
+                  </v-btn>
+                </template>
+              </v-data-table>
             </v-card>
           </v-col>
         </v-row>
@@ -83,7 +134,7 @@
     </v-main>
 
     <!-- Footer -->
-    <v-footer class="touni-footer">
+    <v-footer class="touni-footer" style="position: fixed; bottom: 0; width: 100%">
       <v-container
         fluid
         class="d-flex justify-space-between align-center touni-text-color"
@@ -133,6 +184,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import logo from "../assets/logo.png";
+import coin from "../assets/coin.png";
 import avatar from "../assets/avatar.png";
 import tournament from "../assets/tournament.png";
 
@@ -142,7 +194,7 @@ const headers = [
   { title: "Entrada", value: "buyin" },
   { title: "Tipo", value: "types" },
   { title: "Prize", value: "prize" },
-  { title: "", value: "status" },
+  { title: "", value: "estado" },
 ];
 
 const items = [
@@ -152,7 +204,7 @@ const items = [
     buyin: "5 USDT",
     types: "👾",
     prize: "500 USDT",
-    status: "REGISTRATION",
+    estado: "R",
   },
   {
     date: "Jun 15 - 21:00",
@@ -160,7 +212,7 @@ const items = [
     buyin: "5 USDT",
     types: "🌿",
     prize: "1.000 USDT",
-    status: "UNREGISTRATION",
+    estado: "U",
   },
   {
     date: "Jun 15 - 22:30",
@@ -168,10 +220,13 @@ const items = [
     buyin: "5 USDT",
     types: "🤖",
     prize: "2.000 USDT",
-    status: "REGISTRATION",
+    estado: "REGISTRATIRON",
   },
 ];
 
+// Grieta del Invocador (5v5):
+// ARAM (All Random All Mid):
+// Teamfight Tactics (TFT)
 const currentTime = ref(
   new Date().toLocaleTimeString("es-AR", {
     hour: "2-digit",
@@ -195,53 +250,83 @@ onMounted(() => {
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
 
+/* Estilos base y layout principal */
 .touni-app {
   font-family: "Orbitron", sans-serif;
   color: #00ff88;
-  background: url("@/assets/dashboard.png") center center / cover no-repeat;
-  min-height: 100vh; /* Asegura que ocupe al menos el alto de la pantalla */
-  overflow: hidden; /* Evita scroll no deseado */
-  margin: 0;
-  padding: 0;
+  background: url("@/assets/bg2.png") center center / cover no-repeat;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
+/* Componente toolbar */
 .touni-toolbar {
   background-color: #001f10;
   border-bottom: 1px solid #00ff88;
   box-shadow: 0 2px 10px rgba(0, 255, 100, 0.1);
 }
 
-.glass-card {
+/* Componente main content */
+.touni-background {
+  background: transparent;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 64px;
+}
+
+.v-container {
+  height: 100%;
+}
+
+.v-row {
+  height: 100%;
+}
+
+/* Componente footer */
+.touni-footer {
   background: rgba(0, 30, 10, 0.85);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid #00ff88;
+  height: 64px;
+  z-index: 100;
+  flex: unset;
+  padding: unset;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Componentes de tarjetas */
+.glass-card {
+  background: rgba(0, 30, 10, 0.4);
   backdrop-filter: blur(6px);
   border: 1px solid #00ff88;
   box-shadow: 0 0 10px rgba(0, 255, 150, 0.2);
   color: #00ff88;
 }
 
-.touni-footer {
-  background-color: transparent;
-  border-top: 1px solid #00ff88;
-  flex: unset;
-  padding: unset;
+.rounded {
+  border-radius: 50px !important;
 }
 
+/* Componentes de imágenes */
 .img-logo :deep(.v-img__img) {
   width: unset;
 }
 
+/* Componentes de botones */
 .top-button {
   align-self: flex-start;
   margin-top: 10px;
   border: 1px solid #00ff88;
 }
 
-.font-weight-normal {
-  font-weight: normal;
-}
-
+/* Tipografía y textos */
 .touni-text-color {
   color: #00ff88 !important;
 }
@@ -251,41 +336,30 @@ onMounted(() => {
   font-weight: normal;
   color: #00ff88;
 }
-/*
 
-.v-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.font-weight-normal {
+  font-weight: normal;
 }
 
-.v-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.v-row {
-  flex: 1;
-}
-
-.glass-card {
-  background: rgba(0, 30, 10, 0.85);
-  backdrop-filter: blur(6px);
-  border: 1px solid #00ff88;
-  box-shadow: 0 0 10px rgba(0, 255, 150, 0.2);
-  color: #00ff88;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-*/
+/* Tablas */
 .v-data-table {
   flex: 1;
   background: transparent !important;
   color: #00ff88;
 }
+
 .v-data-table ::v-deep .v-data-table__wrapper {
   height: 100%;
+}
+
+/* Responsive - Media queries */
+@media (max-width: 768px) {
+  .touni-footer {
+    height: auto;
+    padding: 8px 0;
+  }
+  .touni-background {
+    padding-bottom: 100px;
+  }
 }
 </style>
