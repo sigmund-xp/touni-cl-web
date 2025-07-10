@@ -66,7 +66,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.svg";
 
 const router = useRouter();
 
@@ -96,7 +96,7 @@ function handleLogin() {
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
 
 .login-container {
-  background: url("@/assets/bg1.png") center center / cover no-repeat;
+  background: url("@/assets/bg1.webp") center center / cover no-repeat;
   position: relative;
   padding: 2rem;
   background-color: #000;

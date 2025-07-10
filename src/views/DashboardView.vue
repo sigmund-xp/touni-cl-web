@@ -67,7 +67,7 @@
           <!-- Left card: Featured Tournament -->
           <v-col cols="12" md="3">
             <v-card class="glass-card mb-4">
-              <v-img :src="tournament"></v-img>
+              <v-img :src="tournament" />
               <v-card-text>
                 <h3 class="touni-text-color font-weight-normal">10 USDT Entrada</h3>
                 <p class="touni-text-color text-h6 touni-text">1.500 USDT PRIZE-POOL</p>
@@ -92,7 +92,6 @@
             </v-card>
           </v-col>
 
-          <!-- Right card: Match table -->
           <v-col cols="12" md="9">
             <v-card class="glass-card d-flex flex-column" style="height: 100%">
               <v-card-title class="touni-text-color">Torneos Destacados</v-card-title>
@@ -183,10 +182,10 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import logo from "../assets/logo.png";
-import coin from "../assets/coin.png";
-import avatar from "../assets/avatar.png";
-import tournament from "../assets/tournament.png";
+import logo from "../assets/logo.svg";
+import coin from "../assets/coin.webp";
+import avatar from "../assets/avatar.webp";
+import tournament from "../assets/tournament.webp";
 
 const headers = [
   { title: "Fecha", value: "date" },
@@ -254,7 +253,7 @@ onMounted(() => {
 .touni-app {
   font-family: "Orbitron", sans-serif;
   color: #00ff88;
-  background: url("@/assets/bg2.png") center center / cover no-repeat;
+  background: url("@/assets/bg2.webp") center center / cover no-repeat;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
