@@ -5,6 +5,8 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import { createPinia } from 'pinia'
 
+import './styles/global.css'
+
 const pinia = createPinia()
 loadFonts()
 

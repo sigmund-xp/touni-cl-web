@@ -15,9 +15,11 @@
               </v-avatar>
               SummonerName
             </v-col>
-            <v-col cols="5" class="touni-text-color">Saldo $ 4,56 | 524,20 USDT</v-col>
+            <v-col cols="5" class="touni-text-color"
+              >Saldo: {{ formatBalance(balance.availableBalance) }} USDT</v-col
+            >
             <v-col cols="3" class="touni-text-color">
-              <v-btn block color="#00ff88" class="font-orbitron">
+              <v-btn block color="#00ff88" class="font-orbitron" @click.prevent="logout">
                 <v-icon start>mdi-logout</v-icon>
                 Cerrar sessión
               </v-btn>
@@ -129,62 +131,77 @@
             </v-card>
           </v-col>
         </v-row>
-        <!-- Footer -->
-        <v-footer class="touni-footer" style="position: fixed; bottom: 0; width: 100%">
-          <v-container
-            fluid
-            class="d-flex justify-space-between align-center touni-text-color"
-          >
-            <div class="d-flex align-center">
-              <v-icon size="x-large">mdi-clock-outline</v-icon>
-              <span class="ml-2 mr-12">{{ currentTime }}</span>
-              <v-icon size="x-large">mdi-account-group</v-icon>
-              <span class="ml-2">{{ playersOnline }} online</span>
-            </div>
-            <div class="d-flex gap-4 align-right">
-              <v-btn class="mr-2" variant="outlined" icon>
-                <svg
-                  viewBox="-5 -5 35 35"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="30"
-                  height="30"
-                >
-                  <path
-                    d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
-                  />
-                </svg>
-              </v-btn>
-              <v-btn class="mr-2" variant="outlined" icon>
-                <svg
-                  viewBox="-3 -3 30 30"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="30"
-                  height="30"
-                >
-                  <path
-                    d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"
-                  />
-                </svg>
-              </v-btn>
-              <v-btn class="mr-2" variant="outlined" icon="mdi-twitch" />
-              <v-btn class="mr-2" variant="outlined" icon="mdi-youtube" />
-              <v-btn variant="outlined" icon="mdi-instagram" />
-            </div>
-          </v-container>
-        </v-footer>
       </v-container>
+      <!-- Diálogos -->
+      <DepositDialog v-model="showDepositDialog" />
+      <WithdrawDialog v-model="showWithdrawDialog" />
     </v-main>
+    <!-- Footer -->
+    <v-footer class="touni-footer" style="position: fixed; bottom: 0; width: 100%">
+      <v-container
+        fluid
+        class="d-flex justify-space-between align-center touni-text-color"
+      >
+        <div class="d-flex align-center">
+          <v-icon size="x-large">mdi-clock-outline</v-icon>
+          <span class="ml-2 mr-12">{{ currentTime }}</span>
+          <v-icon size="x-large">mdi-account-group</v-icon>
+          <span class="ml-2">{{ playersOnline }} online</span>
+        </div>
+        <div class="d-flex gap-4 align-right">
+          <v-btn class="mr-2" variant="outlined" icon>
+            <svg
+              viewBox="-5 -5 35 35"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="30"
+            >
+              <path
+                d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
+              />
+            </svg>
+          </v-btn>
+          <v-btn class="mr-2" variant="outlined" icon>
+            <svg
+              viewBox="-3 -3 30 30"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="30"
+            >
+              <path
+                d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"
+              />
+            </svg>
+          </v-btn>
+          <v-btn class="mr-2" variant="outlined" icon="mdi-twitch" />
+          <v-btn class="mr-2" variant="outlined" icon="mdi-youtube" />
+          <v-btn variant="outlined" icon="mdi-instagram" />
+        </div>
+      </v-container>
+    </v-footer>
   </v-app>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth.store";
+import api from "@/services/api.service";
+import { useRouter } from "vue-router";
+
 import logo from "../assets/logo.svg";
 import coin from "../assets/coin.webp";
 import avatar from "../assets/avatar.webp";
 import tournament from "../assets/tournament.webp";
+
+const authStore = useAuthStore();
+const router = useRouter();
+const balance = ref({
+  availableBalance: 0,
+  totalDeposited: 0,
+  currency: "USDT",
+});
 
 const headers = [
   { title: "Fecha", value: "date" },
@@ -222,9 +239,11 @@ const items = [
   },
 ];
 
-// Grieta del Invocador (5v5):
-// ARAM (All Random All Mid):
-// Teamfight Tactics (TFT)
+const logout = async () => {
+  await authStore.logout();
+  router.push("/");
+};
+
 const currentTime = ref(
   new Date().toLocaleTimeString("es-AR", {
     hour: "2-digit",
@@ -234,7 +253,17 @@ const currentTime = ref(
 );
 const playersOnline = ref(257);
 
-onMounted(() => {
+const refreshBalance = async () => {
+  try {
+    const balanceRes = await api.get("/balance");
+    balance.value = balanceRes.data;
+  } catch (error) {
+    console.error("Error loading dashboard data:", error);
+  }
+};
+
+onMounted(async () => {
+  await refreshBalance();
   setInterval(() => {
     currentTime.value = new Date().toLocaleTimeString("es-AR", {
       hour: "2-digit",
@@ -243,40 +272,14 @@ onMounted(() => {
     });
   }, 60000);
 });
+
+const formatBalance = (number) => {
+  const formatter = new Intl.NumberFormat("es-AR", {});
+  return formatter.format(number);
+};
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
-
-/* Estilos base y layout principal */
-.touni-app {
-  font-family: "Orbitron", sans-serif;
-  color: #00ff88;
-  background: url("@/assets/bg2.webp") center center / cover no-repeat;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-}
-
-/* Componente toolbar */
-.touni-toolbar {
-  background-color: #001f10;
-  border-bottom: 1px solid #00ff88;
-  box-shadow: 0 2px 10px rgba(0, 255, 100, 0.1);
-}
-
-/* Componente main content */
-.touni-background {
-  background: transparent;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 64px;
-}
-
 .v-container {
   height: 100%;
 }
@@ -285,21 +288,6 @@ onMounted(() => {
   height: 100%;
 }
 
-/* Componente footer */
-.touni-footer {
-  background: rgba(0, 30, 10, 0.85);
-  backdrop-filter: blur(6px);
-  border-top: 1px solid #00ff88;
-  height: 64px;
-  z-index: 100;
-  flex: unset;
-  padding: unset;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-
-/* Componentes de tarjetas */
 .glass-card {
   background: rgba(0, 30, 10, 0.4);
   backdrop-filter: blur(6px);
@@ -317,24 +305,6 @@ onMounted(() => {
   width: unset;
 }
 
-/* Componentes de botones */
-.top-button {
-  align-self: flex-start;
-  margin-top: 10px;
-  border: 1px solid #00ff88;
-}
-
-/* Tipografía y textos */
-.touni-text-color {
-  color: #00ff88 !important;
-}
-
-.touni-text {
-  font-family: "Orbitron", sans-serif;
-  font-weight: normal;
-  color: #00ff88;
-}
-
 .font-weight-normal {
   font-weight: normal;
 }
@@ -348,16 +318,5 @@ onMounted(() => {
 
 .v-data-table ::v-deep .v-data-table__wrapper {
   height: 100%;
-}
-
-/* Responsive - Media queries */
-@media (max-width: 768px) {
-  .touni-footer {
-    height: auto;
-    padding: 8px 0;
-  }
-  .touni-background {
-    padding-bottom: 100px;
-  }
 }
 </style>

@@ -8,4 +8,3 @@ export const useUIStore = defineStore('ui', () => {
 
   return { loading, startLoading, stopLoading }
 })
-

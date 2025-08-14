@@ -2,94 +2,128 @@
   <v-container
     fluid
     class="login-container fill-height d-flex align-center justify-center"
+    :class="{ 'pa-4': $vuetify.display.mobile }"
   >
-    <div class="login-overlay"></div>
-    <v-row dense class="mt-32 mt-md-0">
-      <v-col cols="12">
-        <div class="text-center mb-0 mb-md-6">
-          <v-img
-            :src="logo"
-            contain
-            max-height="100"
-            class="max-height-md-400 max-height-lg-600"
-          />
-        </div>
-      </v-col>
-      <v-col cols="12">
-        <v-container fluid class="d-flex align-center justify-center">
-          <v-card class="login-card" elevation="24">
-            <v-card-text>
-              <v-form @submit.prevent="handleLogin">
-                <v-text-field
-                  v-model="username"
-                  label="Usuario"
-                  variant="outlined"
-                  color="success"
-                  prepend-inner-icon="mdi-account"
-                  :rules="[rules.required]"
-                  class="mb-4 green-input"
-                />
-
-                <v-text-field
-                  v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  label="Contraseña"
-                  variant="outlined"
-                  color="success"
-                  prepend-inner-icon="mdi-lock"
-                  :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                  @click:append-inner="showPassword = !showPassword"
-                  :rules="[rules.required]"
-                  class="mb-4 green-input"
-                />
-
-                <v-btn
-                  block
-                  color="#00ff88"
-                  type="submit"
-                  :loading="loading"
-                  class="font-orbitron"
-                  @click.prevent="toDash()"
-                >
-                  <v-icon start>mdi-login</v-icon>
-                  Iniciar sesión
-                </v-btn>
-              </v-form>
-            </v-card-text>
-          </v-card>
-        </v-container>
-      </v-col>
-    </v-row>
+    <div class="d-flex flex-column align-center">
+      <v-row class="mb-4">
+        <v-img
+          :src="logo"
+          contain
+          :max-height="$vuetify.display.mobile ? '100px' : '200px'"
+          width="auto"
+        />
+      </v-row>
+      <v-row>
+        <v-card
+          class="login-card"
+          :elevation="$vuetify.display.mobile ? 12 : 24"
+          width="auto"
+        >
+          <v-card-text>
+            <v-form @submit.prevent="handleSubmit">
+              <v-text-field
+                v-model="email"
+                label="Email"
+                variant="outlined"
+                color="success"
+                prepend-inner-icon="mdi-email"
+                :rules="emailRules"
+                class="mt-1 mb-4 green-input"
+                :density="$vuetify.display.mobile ? 'compact' : 'default'"
+              />
+              <v-text-field
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                label="Contraseña"
+                variant="outlined"
+                color="success"
+                prepend-inner-icon="mdi-lock"
+                :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append-inner="showPassword = !showPassword"
+                :rules="passwordRules"
+                class="mb-4 green-input"
+                :density="$vuetify.display.mobile ? 'compact' : 'default'"
+              />
+              <v-btn
+                block
+                color="#00ff88"
+                type="submit"
+                :loading="loading"
+                class="font-orbitron"
+                :size="$vuetify.display.mobile ? 'small' : 'default'"
+              >
+                <v-icon start>mdi-login</v-icon>
+                Iniciar sesión
+              </v-btn>
+              <v-row>
+                <v-col class="pl-7 pr-7">
+                  <v-btn
+                    block
+                    variant="outlined"
+                    color="#00ff88"
+                    to="/register"
+                    class="mt-4"
+                    :class="$vuetify.display.mobile ? 'x-small-font' : 'small-font'"
+                    :size="$vuetify.display.mobile ? 'small' : 'default'"
+                  >
+                    ¿No tienes cuenta? Regístrate
+                  </v-btn>
+                </v-col>
+              </v-row>
+              <v-alert v-if="error" type="error" class="mt-4">
+                {{ error }}
+              </v-alert>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-row>
+    </div>
   </v-container>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { useAuthStore } from "@/stores/auth.store";
 import { useRouter } from "vue-router";
 import logo from "@/assets/logo.svg";
 
-const router = useRouter();
-
-const username = ref("");
+const email = ref("");
 const password = ref("");
 const showPassword = ref(false);
 const loading = ref(false);
+const error = ref("");
 
-const rules = {
-  required: (v) => !!v || "Este campo es obligatorio",
-};
+const emailRules = [
+  (v) => !!v || "Email es requerido",
+  (v) => /.+@.+\..+/.test(v) || "Email debe ser válido",
+];
 
-const toDash = async () => {
-  router.push("/dashboard");
-};
+const passwordRules = [
+  (v) => !!v || "Contraseña es requerida",
+  (v) => (v && v.length >= 8) || "Contraseña debe tener al menos 8 caracteres",
+];
 
-function handleLogin() {
-  loading.value = true;
-  setTimeout(() => {
-    console.log("Login:", username.value, password.value);
+const authStore = useAuthStore();
+const router = useRouter();
+
+const handleSubmit = async () => {
+  try {
+    loading.value = true;
+    error.value = "";
+
+    await authStore.login(email.value, password.value);
+
+    if (authStore.user.isVerified) {
+      router.push("/dashboard");
+    } else {
+      router.push("/verify");
+    }
+  } catch (err) {
+    error.value = err.response?.data?.message || "Error al iniciar sesión";
+  } finally {
     loading.value = false;
-  }, 1000);
-}
+  }
+};
 </script>
 
 <style scoped>
@@ -112,118 +146,26 @@ function handleLogin() {
 
 .login-card {
   width: 100%;
-  max-width: 400px;
-  z-index: 1;
   background-color: rgba(0, 20, 10, 0.9);
   border: 1px solid #00ff88;
   box-shadow: 0 0 30px rgba(0, 255, 150, 0.3);
   font-family: "Orbitron", sans-serif;
+  max-width: 400px;
+}
+
+.x-small-font {
+  font-size: 8px !important;
+}
+
+.small-font {
+  font-size: 10px !important;
 }
 
 .logo-image {
-  filter: drop-shadow(0 0 10px rgba(0, 255, 150, 0.6));
+  max-height: 100%;
 }
 
 .mt-32 {
   margin-top: 200px;
-}
-
-.max-height-lg-600 {
-  @media (min-width: 960px) {
-    max-height: 200px !important;
-  }
-}
-
-.green-text {
-  color: #00ff88 !important;
-}
-
-/* Estilos para los inputs verdes desde el inicio */
-.green-input :deep(.v-field) {
-  border-color: #00ff88 !important;
-  background-color: rgba(0, 30, 15, 0.8) !important;
-}
-
-.green-input :deep(.v-field--variant-outlined) {
-  border-color: #00ff88 !important;
-}
-
-.green-input :deep(.v-field--variant-outlined .v-field__outline) {
-  border-color: #00ff88 !important;
-}
-
-.green-input :deep(.v-field--variant-outlined .v-field__outline::before) {
-  border-color: #00ff88 !important;
-}
-
-.green-input :deep(.v-field--variant-outlined .v-field__outline::after) {
-  border-color: #00ff88 !important;
-}
-
-/* Label color */
-.green-input :deep(.v-label) {
-  color: #00ff88 !important;
-}
-
-/* Input text color */
-.green-input :deep(.v-field__input) {
-  color: #ffffff !important;
-}
-
-/* Icon colors */
-.green-input :deep(.v-field__prepend-inner) {
-  color: #00ff88 !important;
-}
-
-.green-input :deep(.v-field__append-inner) {
-  color: #00ff88 !important;
-}
-
-/* Placeholder text */
-.green-input :deep(.v-field__input::placeholder) {
-  color: rgba(0, 255, 136, 0.7) !important;
-}
-
-/* Hover effect */
-.green-input :deep(.v-field:hover) {
-  border-color: #00ff88 !important;
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3) !important;
-}
-
-.green-input :deep(.v-field:hover .v-field__outline) {
-  border-color: #00ff88 !important;
-}
-
-/* Focus effect */
-.green-input :deep(.v-field--focused) {
-  border-color: #00ff88 !important;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5) !important;
-}
-
-.green-input :deep(.v-field--focused .v-field__outline) {
-  border-color: #00ff88 !important;
-}
-
-/* Error state override */
-.green-input :deep(.v-field--error) {
-  border-color: #ff4444 !important;
-}
-
-.green-input :deep(.v-field--error .v-field__outline) {
-  border-color: #ff4444 !important;
-}
-
-.green-input :deep(.v-field--error .v-label) {
-  color: #ff4444 !important;
-}
-
-/* Glow effect constant */
-.green-input :deep(.v-field) {
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.2) !important;
-  transition: all 0.3s ease !important;
-}
-
-.font-orbitron {
-  font-family: "Orbitron", sans-serif !important;
 }
 </style>
